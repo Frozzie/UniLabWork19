@@ -6,71 +6,6 @@
 #include <string.h>
 #include "matrix.h"
 
-#define MAX_BUFFER_SIZE    5000001
-
-#define TIME_TEST(testCode, time) \
-{ \
-    clock_t start_time = clock(); \
-    testCode \
-    clock_t end_time = clock();\
-    clock_t sort_time = end_time - start_time; \
-    time = (double) sort_time / CLOCKS_PER_SEC; \
-}
-
-#define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])
-
-typedef struct SortFunc 
-{
-    void    (*sort)(int *a, size_t n);  // указатель на функцию сортировки
-    char    name[64];                   // имя сортировки, используемое при выводе
-} SortFunc;
-
-typedef struct SortFuncNComp
-{
-    long long    (*sort)(int *a, size_t n);  // указатель на функцию сортировки
-    char    name[64];                   // имя сортировки, используемое при выводе
-} SortFuncNComp;
-
-typedef struct GeneratingFunc 
-{
-    void (*generate)(int *a, size_t n); // указатель на функцию генерации последоват.
-    char name[64];                      // имя генератора, используемое при выводе
-} GeneratingFunc;
-
-uint8_t digit(int a, uint8_t n)
-{
-    uint8_t shift = n * 8;
-    return (uint8_t)(a >> shift);
-}
-
-double getTime() 
-{
-    clock_t start_time = clock(); 
-        // фрагмент кода
-        // время которого измеряется
-    clock_t end_time = clock(); 
-    clock_t sort_time = end_time - start_time;
-    return (double) sort_time / CLOCKS_PER_SEC;
-}
-
-bool isOrdered(int *a, size_t n)
-{
-    bool answ = true;
-    int prev = a[0];
-
-    for(size_t i = 1; i < n; i++)
-    {
-        if(prev > a[i])
-        {
-            answ = false;
-            break;
-        }
-        prev = a[i];
-    }
-
-    return answ;
-}
-
 void outputArray_(int *a, size_t n)
 {
     for(size_t i = 0; i < n; i++)
@@ -245,68 +180,25 @@ void shellSort (int *a, size_t n)
     }
 }
 
-void radixSort (int *a, size_t n)
-{
-    const size_t len = sizeof(int);     // длина числа
-    const size_t radix = 256;           // количество чисел в разряде 2^8 // основание системы счисления
-    size_t basket_len = n;
-    uint8_t d;
-
-    if (basket_len > 1500000)
-    {
-        basket_len = 1500000;
-    }
-
-    int *b = malloc(sizeof(int) * radix),       // число чисел в корзине
-        *c = malloc(sizeof(int) * radix * basket_len);   // корзины для сортировки radix
-
-    for (size_t i = 0; i < len; i++)  // перебираем все разряды, начиная с нулевого
-    {   
-        memset (b, 0, sizeof(int) * radix); // пустой массив корзин b = 0  
-
-        for (size_t j = 0; j < n; j++)
-        {
-            int val = a[i];
-            d = digit(val, i);              // получаем цифру, стоящую на текущем разряде в каждом числе массива
-            int index = (d * basket_len) + b[d];     // индекс записи
-            c[index] = val;                 // отправляем число в промежуточный массив в корзину, которая совпадает со значением этой цифры
-            b[d]++;                         // добавляем число чисел в корзине
-        }
-
-        size_t count = 0;
-        
-        // сложим обратно числа из корзин в массив a
-        for (size_t j = 0; j < radix; j++)
-        {
-            int k = 0;
-            int bj = b[j];
-            while (k < bj)
-            {
-                a[count++] = c[(j * basket_len) + k];
-                k++;
-            }
-        }
-    }
-    free(b);
-    free(c);
-}
-
 void task1()
 {
     char file[] = {"task1.txt"};
     char file_res[] = {"task1_a.txt"};
+
     FILE *f_orig = fopen(file, "r");
     if (f_orig == NULL)
     {
         printf ("Task1 error open original file\n");
         return;
     }
+
     FILE *f_res = fopen(file_res, "w");
     if (f_res == NULL)
     {
         printf ("Task1 error open result file\n");
         return;
     }
+    
     int size;
     //input matrix from file
 
@@ -323,10 +215,6 @@ void task1()
         }
 
         matrix mat = createMatrixFromArray(arr, size, size);
-        
-        //transposeMatrix(&mat);
-
-        //output matrix to new file
 
         fprintf(f_res,"%d\n", size);
 
@@ -351,24 +239,226 @@ void task1()
 
 void task2()
 {
-    // char *file = malloc(strlen()); // first argument is file name in
-    // strcpy(file, );
+    char file[] = {"task2.txt"};
+    char file_res[] = {"task2_a.txt"};
 
-    // int size = atoi(); // second argument is max num
+    FILE *f_orig = fopen(file, "r");
+    if (f_orig == NULL)
+    {
+        printf ("Task2 error open original file\n");
+        return;
+    }
 
-    // FILE *f = fopen(file, "r");
+    FILE *f_res = fopen(file_res, "w");
+    if (f_res == NULL)
+    {
+        printf ("Task2 error open result file\n");
+        return;
+    }
 
-    // int *arr = malloc(sizeof(int) * size * size); 
+    //code here
+    int range;
+    char num[20];
+    float num_integer, num_fraction, num_res;
 
-    // matrix mat = createMatrixFromArray(arr, size, size);
-    
+    while(fscanf (f_orig, "%s", num) > 0)
+    {
+        num_res = atof(num);
+        fprintf(f_res, "%.2f\n", num_res);
+    }
+
+    fclose(f_orig);
+    fclose(f_res);
+
+    remove(file);
+    rename(file_res, file);
 }
+
+float subTask3 (float num1, float num2, char c)
+{
+    float answ;
+    switch (c)
+    {
+        case '*':
+            answ = num1 * num2;
+        break;
+
+        case '/':
+            answ = num1 / num2;
+        break;
+
+        case '+':
+            answ = num1 + num2;
+        break;
+
+        case '-':
+            answ = num1 - num2;
+        break;
+
+        default:
+        break;
+    }
+
+    return answ;
+}
+
+void task3()
+{
+    char file[] = {"task3.txt"};
+
+    FILE *f = fopen(file, "r+t");
+    if (f == NULL)
+    {
+        printf ("Task3 error open original file\n");
+        return;
+    }
+
+    char sym1[2], sym2[2];
+    bool two_operations = false;
+    float num1, num2, num3, answ;
+
+    fscanf (f, "%f", &num1);
+    fscanf (f, "%s", sym1);
+    fscanf (f, "%f", &num2);
+    
+    if(fscanf (f, "%s", sym2) > 0)
+    {
+        fscanf (f, "%f", &num3);
+        two_operations = true;
+    }
+
+    if(two_operations)
+    {
+        if((sym1[0] == '+' || sym1[0] == '-') && (sym2[0] == '*' || sym2[0] == '/')) //reverse order
+        {
+            answ = subTask3(num2, num3, sym2[0]);
+            answ = subTask3(num1, answ, sym1[0]);
+        }
+        else
+        {
+            answ = subTask3(num1, num2, sym1[0]);
+            answ = subTask3(answ, num3, sym2[0]);
+        }
+    }
+    else
+    {
+        answ = subTask3(num1, num2, sym1[0]);
+    }
+
+    fprintf(f, "= %f", answ);
+
+    fclose(f);
+}
+
+void task4(char *str)
+{
+    char file[] = {"task4.txt"};
+    char file_res[] = {"task4_a.txt"};
+
+    FILE *f_orig = fopen(file, "r");
+    if (f_orig == NULL)
+    {
+        printf ("Task4 error open original file\n");
+        return;
+    }
+
+    FILE *f_res = fopen(file_res, "w");
+    if (f_res == NULL)
+    {
+        printf ("Task4 error open result file\n");
+        return;
+    }
+
+    int input;
+    char word[50];
+    input = fscanf (f_orig, "%s", word);
+
+    while(input > 0)
+    {   
+        char *ret;
+        ret = strstr(word, str);
+
+        if(ret != NULL)
+        {
+            fprintf(f_res, "%s ", ret);
+        }
+
+        input = fscanf (f_orig, "%s", word);
+    }
+
+    fclose(f_orig);
+    fclose(f_res);
+
+    remove(file);
+    rename(file_res, file);
+}
+
+void task5()
+{
+    char file[] = {"task5.txt"};
+    char file_res[] = {"task5_a.txt"};
+
+    FILE *f_orig = fopen(file, "r");
+    if (f_orig == NULL)
+    {
+        printf ("Task5 error open original file\n");
+        return;
+    }
+
+    FILE *f_res = fopen(file_res, "w");
+    if (f_res == NULL)
+    {
+        printf ("Task5 error open result file\n");
+        return;
+    }
+
+    char *fstr;
+    int size, read;
+    int max_size;
+    char str[100];
+    char word[100];
+    char max_word[100];
+
+    fstr = fgets(str, 100, f_orig);
+
+    while (fstr != NULL)
+    {
+        char *str_read = str;
+        read = sscanf(str_read, "%s", word);
+        max_size = 0;
+
+        while (read > 0)
+        {
+            size = strlen (word);
+            if(max_size < size)
+            {
+                max_size = size;
+                strcpy(max_word, word);
+            }
+            str_read += size + 1;
+            read = sscanf(str_read, "%s ", word);
+        }
+        
+        fprintf (f_res, "%s\n", max_word);
+        fstr = fgets (str, 100, f_orig);
+    }
+
+
+    fclose (f_orig);
+    fclose (f_res);
+
+    remove (file);
+    rename (file_res, file);
+}
+
 int main(int argc, char **argv) 
 {
+    char task_4[2] = {"a"};
     task1();
-    
-    //timeExperiment();
-    //timeExperimentNComp();
+    task2();    
+    task3();
+    task4(task_4);
+    task5();
 
     return 0;
 }
