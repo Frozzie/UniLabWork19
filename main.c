@@ -7,54 +7,34 @@
 #include <math.h>
 #include "matrix.h"
 
-
-void mySort (int *a, size_t n)
+typedef struct _sportsman
 {
-    int *start = &a[0];
-    int *end = &a[n];
-    int *min;
-    int *start1;
+    char surname[20];
+    char name[20];
+    char patreos[20];
+    int  max_point;
+} sportsman;
 
-    while (start < end)
-    {
-        // find min value in range start1 - end
-        min = start;
-        int *start1 = start;
-        while (start1 < end)
-        {
-            if (*min > *start1)
-            {
-                min = start1;
-            }
-            start1++;
-        }
-        // swap min to start
-        if (min > start)
-        {
-            int temp = *min;
-            *min = *start;
-            *start = temp;
-        }
-        start++;
-    }
-}
-
-void selectionSort (int *a, size_t n)
+typedef struct _best_sportsman
 {
-    for (int i = 1; i < n; i++)
-    {
-        int newElement = a[i];
-        int location = i - 1;
+    char surname[20];
+    char name[20];
+    char patreos[20];
+} best_sportsman;
 
-        while(location >= 0 && a[location] > newElement)
-        {
-            a[location + 1] = a[location];
-            location = location - 1;
-        }
+typedef struct _storage
+{
+    char name[20];
+    float price;
+    float total_price;
+    float amount;
+} storage;
 
-        a[location + 1] = newElement;
-    }
-}
+typedef struct _sell
+{
+    char name[20];
+    float amount;
+} sell;
 
 void insertionSort (int *a, size_t n)
 {
@@ -78,43 +58,380 @@ void insertionSort (int *a, size_t n)
     }
 }
 
-void brushSort (int *a, size_t n)
+void file_gen_task1(int max_lines) 
 {
-    float factor = 1.05;
-	size_t step = n - 1;
+    FILE *file = fopen("task1.txt", "w");
     
-	while (step >= 1)
-	{
-		for (size_t i = 0; i + step < n; i++)
-		{
-            int *a_i = &a[i];
-            int *a_i_step = &a[i + step];
-			if (*a_i > *a_i_step)
-			{
-				int temp = *a_i;
-                *a_i = *a_i_step;
-                *a_i_step = temp;
-			}
-		}
+    if (file == NULL)
+    {
+        printf ("Task1 error open original file\n");
+        return;
+    }
 
-	    step = (size_t)((float)step/factor);
-	}
+    srand((unsigned int) time(NULL));
+
+    fprintf(file, "%d\n", max_lines);
+
+    for (int i = 0; i < max_lines; i++) 
+    {
+        for (int j = 0; j < max_lines; j++) 
+        {
+            int number = rand() % 1000;
+
+            fprintf(file, "%d ", number);
+        }
+        fprintf(file, "\n");
+    }
+
+    fclose(file);
 }
 
-void shellSort (int *a, size_t n)
+void file_gen_task2(int max_lines)
 {
-    for (int s = n / 2; s > 0; s /= 2) 
+    FILE *file = fopen("task2.txt", "w");
+    
+    if (file == NULL)
     {
-        for (int i = s; i < n; ++i) 
+        printf ("Task2 error open original file\n");
+        return;
+    }
+
+    for (int i = 0; i < max_lines; i++) 
+    {
+        int number = 1 + rand() % 999;
+        fprintf(file, "%d.", number);
+        number = 1 + rand() % 999;
+        fprintf(file, "%d", number);
+
+        fprintf(file, "\n");
+    }
+
+    fclose(file);
+}
+
+void file_gen_task3()
+{
+    FILE *file = fopen("task3.txt", "w");
+    
+    if (file == NULL)
+    {
+        printf ("Task3 error open original file\n");
+        return;
+    }
+
+    int op_amount = rand() % 2, number;
+    for(int i = 0; i <= op_amount; i++)
+    {
+        number = 1 + rand() % 9;
+        fprintf(file, "%d ", number);
+
+        int sym = 1 + rand() % 4;
+        if(sym == 1)
         {
-            for (int j = i - s; j >= 0 && a[j] > a[j + s]; j -= s) 
-            {
-                int temp = a[j];
-                a[j] = a[j + s];
-                a[j + s] = temp;
-            }
+            fprintf(file,"/ ");
+        }
+        else if(sym == 2)
+        {
+            fprintf(file,"* ");
+        }
+        else if(sym == 3)
+        {
+            fprintf(file,"- ");
+        }
+        else if(sym == 4)
+        {
+            fprintf(file,"+ ");
         }
     }
+
+    number = 1 + rand() % 9;
+    fprintf(file, "%d =", number);    
+
+    fclose(file);
+}
+
+char generate_random_letter() 
+{
+    int is_upper = rand() % 2;  // Randomly choose between uppercase and lowercase
+    if (is_upper) {
+        return 'A' + rand() % 26;  // Random uppercase letter
+    } else {
+        return 'a' + rand() % 26;  // Random lowercase letter
+    }
+}
+
+void file_gen_task4(int max_lines, int max_letters_per_line)
+{
+    FILE *file = fopen("task4.txt", "w");
+
+    if (file == NULL)
+    {
+        printf ("Task4 error open original file\n");
+        return;
+    }
+
+    for (int i = 0; i < max_lines; i++) 
+    {
+        int letters_in_line = rand() % max_letters_per_line + 1; // Ensure at least 1 letter per line
+        for (int j = 0; j < letters_in_line; j++) 
+        {
+            char letter = generate_random_letter();
+            fprintf(file, "%c", letter);
+
+            if(rand() % 2)
+            {
+                fprintf(file, " ");
+            }
+        }
+        fprintf(file, "\n");
+    }
+
+    fclose(file);
+}
+
+void file_gen_task5(int max_lines, int max_letters_per_line)
+{
+    FILE *file = fopen("task5.txt", "w");
+
+    if (file == NULL)
+    {
+        printf ("Task5 error open original file\n");
+        return;
+    }
+
+    for (int i = 0; i < max_lines; i++) 
+    {
+        int letters_in_line = rand() % max_letters_per_line + 1; // Ensure at least 1 letter per line
+        for (int j = 0; j < letters_in_line; j++) 
+        {
+            char letter = generate_random_letter();
+            fprintf(file, "%c", letter);
+
+            if(rand() % 2)
+            {
+                fprintf(file, " ");
+            }
+        }
+        fprintf(file, "\n");
+    }
+
+    fclose(file);
+}
+
+void file_gen_task6_()
+{
+    FILE *file = fopen("task6.bin", "w");
+
+    if (file == NULL)
+    {
+        printf ("Task6 error open original file\n");
+        return;
+    }
+
+    // int count = 1 + rand() % 10;
+    // for (int j = 0; j < count; j++)
+    // {
+        int num = 1 + rand() % 10, power;
+        power = num;
+        for(int i = 0; i <= num; i++)
+        {
+            fwrite (&power, sizeof(int), 1, file);
+            power--;
+
+            float num2 = ((float)rand() / (float)RAND_MAX) * (float)(rand() % 1000);
+            fwrite(&num2, sizeof(float), 1, file);
+        }
+    // }
+
+    fclose(file);
+}
+
+void file_gen_task6(float x)
+{
+    FILE *file = fopen("task6.bin", "w");
+
+    if (file == NULL)
+    {
+        printf ("Task6 error open original file\n");
+        return;
+    }
+    int count = 1 + rand() % 5;
+
+    for (int j = 0; j < count; j++)
+    {
+        int num = 1 + rand() % 5, power;
+        power = num;
+        double math = 0.0;
+
+        for(int i = 0; i <= num; i++)
+        {
+            double num1 = ((double)rand() / (double)RAND_MAX) * (double)(rand() % 100);
+            
+            fwrite (&power, sizeof(int), 1, file);
+
+            if(power == 0)
+            {
+                num1 = 0.0 - math;
+            }
+            else
+            {
+                math += num1 * pow(x, power);
+            }
+            float temp = (float)num1;
+            fwrite(&temp, sizeof(float), 1, file);
+
+            power--;
+        }
+    }
+    
+
+    fclose(file);
+}
+
+void file_gen_task7()
+{
+    FILE *file = fopen("task7.bin", "w");
+
+    if (file == NULL)
+    {
+        printf ("Task7 error open original file\n");
+        return;
+    }
+
+    int count = 1 + rand() % 100, num;
+
+    for(int i = 0; i < count; i++)
+    {
+        num = 1 + rand() % 1000;
+        fwrite(&num, sizeof(int), 1, file);
+
+        num = 1 + rand() % 1000;
+        num = -num;
+        fwrite(&num, sizeof(int), 1, file);
+    }
+
+    fclose(file);
+}
+
+void file_gen_task8(size_t size)
+{
+    FILE *file = fopen("task8.bin", "w");
+
+    if (file == NULL)
+    {
+        printf ("Task8 error open original file\n");
+        return;
+    }
+
+    int count = 1 + rand() % 100, num;
+
+    for(int i = 0; i < size; i++)
+    {
+        for(int j = 0; j < size; j++)
+        {
+            num = 1 + rand() % 1000;
+            fwrite(&num, sizeof(int), 1, file);
+        }
+    }
+
+    fclose(file);
+}
+
+void file_gen_task9()
+{
+    FILE *file = fopen("task9.bin", "w");
+
+    if (file == NULL)
+    {
+        printf ("Task9 error open original file\n");
+        return;
+    }
+
+    sportsman arr[5] = {
+        {
+            .name = "Ivan",
+            .surname = "Ivanov",
+            .patreos = "Ivanovich"
+        },
+        {
+            .name = "Yakov",
+            .surname = "Ivanov",
+            .patreos = "Ivanovich"
+        },
+        {
+            .name = "Marina",
+            .surname = "Ivanova",
+            .patreos = "Ivanovna"
+        },
+        {
+            .name = "Nicolay",
+            .surname = "Ivanov",
+            .patreos = "Ivanovich"
+        },
+        {
+            .name = "Konstantin",
+            .surname = "Sokolov",
+            .patreos = "Ivanovich"
+        },
+    };
+
+    int amount = 5;
+
+    for(int i = 0; i < amount; i++)
+    {
+        int num = 1 + rand() % 100;
+        arr[i].max_point = num;
+
+        fwrite(&arr[i], sizeof(sportsman), 1, file);
+    }
+
+    fclose(file);
+}
+
+void file_gen_task10()
+{
+    FILE *file = fopen("task10.bin", "w");
+
+    if (file == NULL)
+    {
+        printf ("Task9 error open original file\n");
+        return;
+    }
+
+    storage arr[5] = {
+        {
+           .name = "Cabbage", 
+        },
+        {
+           .name = "Onions", 
+        },
+        {
+           .name = "Carrots", 
+        },
+        {
+           .name = "Apples", 
+        },
+        {
+           .name = "Oranges", 
+        },
+    };
+
+    int amount = 5;
+
+    for(int i = 0; i < amount; i++)
+    {
+        int num1 = 1 + rand() % 100;
+        arr[i].price = num1;
+
+        int num2 = 1 + rand() % 100;
+        arr[i].amount = num2;
+
+        arr[i].total_price = num1 * num2;
+        
+        fwrite(&arr[i], sizeof(storage), 1, file);
+    }
+
+    fclose(file);
 }
 
 void task1()
@@ -167,6 +484,7 @@ void task1()
         input = fscanf (f_orig, "%d", &size);
     }
 
+    fflush(f_orig);
     fclose(f_orig);
     fclose(f_res);
 
@@ -201,7 +519,7 @@ void task2()
     while(fscanf (f_orig, "%s", num) > 0)
     {
         num_res = atof(num);
-        fprintf(f_res, "%.2f\n", num_res);
+        fprintf(f_res, "%.2e\n", num_res);
     }
 
     fclose(f_orig);
@@ -433,7 +751,7 @@ void task6(float x)
             oper_save[save_counter] = operand;
             save_counter++;
 
-            fread (&power, sizeof(int), 1, f_orig);
+            n_read = fread (&power, sizeof(int), 1, f_orig);
             fread (&operand, sizeof(float), 1, f_orig);
         }
         // free operand
@@ -451,6 +769,8 @@ void task6(float x)
                 fwrite(&oper_save[i], sizeof(float), 1, f_res);
             }
         }
+        n_read = fread (&power, sizeof(power), 1, f_orig);
+        fread (&operand, sizeof(operand), 1, f_orig);
     }
 
     fclose(f_orig);
@@ -588,21 +908,6 @@ void task8(size_t size)
     rename(file_res, file);
 }
 
-typedef struct _sportsman
-{
-    char surname[20];
-    char name[20];
-    char patreos[20];
-    int max_point;
-} sportsman;
-
-typedef struct _best_sportsman
-{
-    char surname[20];
-    char name[20];
-    char patreos[20];
-} best_sportsman;
-
 void sportSort (sportsman *a, size_t n)
 {
     for (int i = 1; i < n; i++)
@@ -669,20 +974,6 @@ void task9(size_t n)
 
     fclose(f_orig);
 }
-
-typedef struct _storage
-{
-    char name[20];
-    float price;
-    float total_price;
-    float amount;
-} storage;
-
-typedef struct _sell
-{
-    char name[20];
-    float amount;
-} sell;
 
 void task10()
 {
@@ -757,20 +1048,158 @@ void task10()
     rename(file_res, file);
 }
 
+void filePrint_txt (char *file_name)
+{
+    FILE *f = fopen(file_name, "r");
+    if (f == NULL)
+    {
+        printf ("error open storage file\n");
+        return;
+    }
+
+    fflush(f);
+    char storage;
+
+    int num = fread(&storage, sizeof(char), 1, f);
+    while(num > 0)
+    {
+        printf("%c", storage);
+
+        num = fread(&storage, sizeof(char), 1, f);
+    }
+}
+
+void filePrint_bin_int (char *file_name, int num_in_line)
+{
+    FILE *f = fopen(file_name, "r");
+    if (f == NULL)
+    {
+        printf ("error open storage file\n");
+        return;
+    }
+
+    fflush(f);
+    int storage, count = 0;
+
+    int num = fread(&storage, sizeof(int), 1, f);
+
+    while(num > 0)
+    {
+        printf("%d, ", storage);
+
+        if(++count >= num_in_line)
+        {
+            count = 0;
+            printf("\n");
+        }
+
+        num = fread(&storage, sizeof(int), 1, f);
+    }
+}
+
+void filePrint_bin_float (char *file_name, int num_in_line)
+{
+    FILE *f = fopen(file_name, "r");
+    if (f == NULL)
+    {
+        printf ("error open storage file\n");
+        return;
+    }
+
+    fflush(f);
+    float storage;
+
+    int num = fread(&storage, sizeof(float), 1, f), count = 0;
+
+    while(num > 0)
+    {
+        printf("%f, ", storage);
+
+        if(++count >= num_in_line)
+        {
+            count = 0;
+            printf("\n");
+        }
+
+        num = fread(&storage, sizeof(float), 1, f), count = 0;
+    }
+}
+
 int main(int argc, char **argv) 
 {
-    char task_4[2] = {"a"};
-    float x = 4.0f;
+    char task_4[] = {"a"};
+    float x = 2.0f;
+
+    printf(" Task 1 source: \n");
+    file_gen_task1(4);
+    filePrint_txt("task1.txt");
     task1();
-    task2();    
+    printf(" Task 1 result: \n");
+    filePrint_txt("task1.txt");
+
+    printf("\n Task 2 source: \n");
+    file_gen_task2(10);
+    filePrint_txt("task2.txt");
+    task2();
+    printf("\n Task 2 result: \n");
+    filePrint_txt("task2.txt");
+
+    printf("\n Task 3 source: \n");
+    file_gen_task3();
+    filePrint_txt("task3.txt");
     task3();
+    printf("\n Task 3 result: \n");
+    filePrint_txt("task3.txt");
+
+    printf("\n\n Task 4 source: \n");
+    file_gen_task4(10, 10);
+    filePrint_txt("task4.txt");
     task4(task_4);
+    printf("\n Task 4 result: \n");
+    filePrint_txt("task4.txt");
+
+    printf("\n Task 5 source: \n");
+    file_gen_task5(10, 10);
+    filePrint_txt("task5.txt");
     task5();
+    printf("\n Task 5 result:\n");
+    filePrint_txt("task5.txt");
+
+    printf("\n Task 6 source: \n");
+    file_gen_task6(x);
+    filePrint_bin_int("task6.bin", 10);
     task6(x);
+    printf("\n Task 6 result:\n");
+    filePrint_bin_int("task6.bin", 10);
+
+    printf("\n\n Task 7 source: \n");
+    file_gen_task7();
+    filePrint_bin_int("task7.bin", 10);
     task7();
+    printf("\n\n Task 7 result:\n");
+    filePrint_bin_int("task7.bin", 10);
+
+    printf("\n\n Task 8 source: \n");
+    file_gen_task8(3);
+    filePrint_bin_int("task8.bin", 10);
     task8(3);
+    printf("\n\n Task 8 result:\n");
+    filePrint_bin_int("task8.bin", 10);
+
+    printf("\n\n Task 9 source: \n");
+    file_gen_task9();
+    filePrint_bin_int("task9.bin", 10);
     task9(3);
+    printf("\n Task 9 result:\n");
+    filePrint_bin_int("task9.bin", 10);
+
+    printf("\n\n Task 10 source: \n");
+    file_gen_task10();
+    filePrint_bin_int("task10.bin", 10);
     task10();
+    printf("\n Task 10 result:\n");
+    filePrint_bin_int("task10.bin", 10);
+
 
     return 0;
 }
